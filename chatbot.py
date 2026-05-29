@@ -1,82 +1,60 @@
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from database import create_database
+from database import save_message
+from database import load_messages
+from auth import signup
+from auth import login
 
-from database import create_database, save_message, load_messages
-from auth import signup, login
+from rag.retrieve import retrieve_context
 
-# Create database
+# DATABASE SETUP
 create_database()
 
-# Load environment variables
+# GEMINI SETUP
 load_dotenv()
 
-# Get API key
 api_key = os.getenv("GEMINI_API_KEY")
 
-# Configure Gemini
+if not api_key:
+    print("Error: GEMINI_API_KEY not found in .env file")
+    exit()
+
 genai.configure(api_key=api_key)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-# Create Gemini model
-model = genai.GenerativeModel("gemini-2.5-flash")
-
-# Naina personality
+# NAINA SYSTEM PROMPT
 SYSTEM_PROMPT = """
-You are Naina, an intelligent and supportive AI eye wellness and visual therapy assistant.
+You are Naina, an intelligent eye wellness and visual therapy assistant.
 
-You specialize in helping users understand and improve:
+You help users understand:
 
-- eye wellness
 - eye strain
-- screen fatigue
 - dry eyes
-- blurry vision
-- blinking habits
-- posture awareness
-- visual comfort
+- visual therapy
+- amblyopia
+- binocular vision
+- convergence insufficiency
+- eye exercises
+- screen fatigue
 - eye coordination
-- lazy eye exercises
-- binocular vision training
-- convergence exercises
-- focus improvement
-- eye relaxation
-- digital eye strain
-- visual therapy exercises
-- eye health awareness
-- common eye conditions
-- preventive eye care
-- eye fitness routines
+- visual wellness
 
-You can explain:
-- eye diseases in simple educational language
-- symptoms and possible causes
-- visual therapy concepts
-- eye exercises and wellness routines
-- screen-related vision problems
-- eye care habits and prevention tips
+Rules:
 
-You should speak:
-- simply
-- warmly
-- supportively
-- clearly
-
-IMPORTANT RULES:
-- Never claim to be a doctor.
-- Never provide medical diagnosis.
-- Never prescribe medicines.
-- Never guarantee treatment outcomes.
-- Encourage users to consult eye specialists for serious concerns.
-
-If users ask unrelated questions outside eye health, visual therapy, or wellness topics, politely redirect them back to eye-related discussions.
-
-Example:
-"I specialize in eye wellness, visual therapy, and vision-related guidance"
+1. Use the provided context whenever possible.
+2. Explain concepts in simple language.
+3. Never diagnose diseases.
+4. Never prescribe medicines.
+5. Encourage consultation with qualified eye care professionals for medical concerns.
+6. If information is not available in the context, clearly mention it.
 """
 
-print("Welcome to Naina AI")
+# WELCOME SCREEN
+print("      Welcome to Naina AI ")
 
-# Authentication menu
+# AUTHENTICATION
 while True:
 
     print("\n1. Sign Up")
@@ -85,6 +63,7 @@ while True:
     choice = input("\nChoose option: ")
 
     if choice == "1":
+
         signup()
 
     elif choice == "2":
@@ -95,54 +74,104 @@ while True:
             break
 
     else:
-        print("\nInvalid choice.")
 
-# Load user memory
+        print("Invalid choice. Try again.")
+
+# LOAD CHAT HISTORY
 messages = load_messages(user_id)
 
 print("\nNaina AI Chatbot")
 print("Type 'exit' to quit.\n")
 
-# Chat loop
+# CHAT LOOP
 while True:
 
     user_input = input("You: ")
 
-    # Exit chatbot
     if user_input.lower() == "exit":
-        print("Naina: Goodbye! Take care of your eyes")
+
+        print("\nNaina: Goodbye! Take care of your eyes ")
         break
 
-    # Save user message
-    save_message(user_id, "user", user_input)
+    # Save User Message
+    save_message(
+        user_id,
+        "user",
+        user_input
+    )
 
-    # Add to memory
     messages.append({
         "role": "user",
         "content": user_input
     })
 
-    # Create conversation history
-    conversation = SYSTEM_PROMPT + "\n\n"
+    # Retrieve Context From Vector Database
+    try:
 
-    for msg in messages:
-        conversation += f"{msg['role']}: {msg['content']}\n"
+        context = retrieve_context(user_input)
 
-    # Gemini response
-    response = model.generate_content(conversation)
+    except Exception as e:
 
-    # Extract reply
-    ai_reply = response.text
+        context = ""
+        print(f"RAG Error: {e}")
 
-    # Save AI reply
-    save_message(user_id, "assistant", ai_reply)
+    # Build Conversation History
+    conversation_history = ""
 
-    # Add AI reply to memory
+    for msg in messages[-10:]:
+
+        conversation_history += (
+            f"{msg['role']}: {msg['content']}\n"
+        )
+
+    # Build Prompt
+
+    prompt = f"""
+{SYSTEM_PROMPT}
+
+Retrieved Context:
+{context}
+
+Conversation History:
+{conversation_history}
+
+User Question:
+{user_input}
+
+Instructions:
+- Use the retrieved context when possible.
+- If context is missing, answer based on your eye wellness knowledge.
+- Keep explanations simple.
+- Mention eye exercises when relevant.
+- Never diagnose diseases.
+
+Answer:
+"""
+
+    # Gemini Response
+    try:
+
+        response = model.generate_content(prompt)
+
+        ai_reply = response.text
+
+    except Exception as e:
+
+        ai_reply = f"Error generating response: {e}"
+
+    # Save AI Reply
+    save_message(
+        user_id,
+        "assistant",
+        ai_reply
+    )
+
     messages.append({
         "role": "assistant",
         "content": ai_reply
     })
 
-    # Print response
-    print("\nNaina:", ai_reply)
+    # Print AI Reply
+    print("\nNaina:")
+    print(ai_reply)
     print()
