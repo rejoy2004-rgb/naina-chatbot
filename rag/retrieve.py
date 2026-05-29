@@ -15,7 +15,7 @@ def retrieve_context(question):
 
     docs = db.similarity_search(
         question,
-        k=4
+        k=2
     )
 
     context = ""
