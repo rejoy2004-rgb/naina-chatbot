@@ -1,53 +1,31 @@
-# 👁️ Naina AI — Eye Wellness & Visual Therapy Assistant
+# 👁️ Naina AI – Eye Wellness & Visual Therapy Assistant
 
-Naina AI is a domain-specific chatbot designed to assist users with eye wellness, visual therapy, amblyopia, binocular vision disorders, dry eyes, screen fatigue, eye exercises, and related visual health topics.
+Naina AI is an intelligent eye wellness and visual therapy assistant powered by Gemini AI and Semantic Retrieval-Augmented Generation (RAG).
 
-The chatbot uses:
-
-* Gemini 2.5 Flash (LLM)
-* Semantic RAG (Retrieval-Augmented Generation)
-* ChromaDB Vector Database
-* Sentence Transformers Embeddings
-* SQLite Database
-* User Authentication System
-* PDF Knowledge Base
+The system helps users understand eye conditions, visual therapy concepts, binocular vision disorders, eye exercises, screen fatigue, dry eyes, amblyopia, and other eye wellness topics using a knowledge base built from research papers and PDFs.
 
 ---
 
-# Features
+## Features
 
-## User Authentication
+### 🤖 AI-Powered Assistant
 
-* User Signup
-* User Login
-* Secure account management
-* SQLite-based storage
+* Gemini 2.5 Flash
+* Natural language conversations
+* Context-aware responses
 
-## Chat Memory
+### 📚 Semantic RAG
 
-* Stores user conversations
-* Retrieves previous messages
-* Maintains conversation context
+* PDF knowledge base
+* ChromaDB vector database
+* Semantic search using embeddings
+* Retrieves relevant research before answering
 
-## Gemini AI Integration
+### 👁️ Eye Wellness Knowledge
 
-* Powered by Gemini 2.5 Flash
-* Natural language understanding
-* Domain-focused responses
+Supports topics such as:
 
-## Semantic RAG
-
-* Reads PDF documents
-* Splits documents into chunks
-* Generates embeddings
-* Stores embeddings in ChromaDB
-* Retrieves relevant information before generating answers
-
-## Eye Wellness Knowledge
-
-Naina can assist with:
-
-* Amblyopia
+* Amblyopia (Lazy Eye)
 * Myopia
 * Hyperopia
 * Dry Eye Syndrome
@@ -55,10 +33,16 @@ Naina can assist with:
 * Visual Fatigue
 * Convergence Insufficiency
 * Binocular Vision Disorders
-* Visual Therapy
+* Vision Therapy
 * Eye Exercises
 * Screen Fatigue
-* Visual Comfort
+
+### 💾 User Features
+
+* User signup and login
+* SQLite database
+* Conversation history
+* Persistent chat memory
 
 ---
 
@@ -67,19 +51,19 @@ Naina can assist with:
 ```text
 naina_chatbot/
 │
+├── app.py
 ├── chatbot.py
 ├── auth.py
 ├── database.py
-├── naina.db
+│
+├── rag/
+│   ├── create_vector_db.py
+│   └── retrieve.py
 │
 ├── documents/
 │   ├── paper1.pdf
 │   ├── paper2.pdf
 │   └── paper3.pdf
-│
-├── rag/
-│   ├── create_vector_db.py
-│   └── retrieve.py
 │
 ├── vector_db/
 │
@@ -99,27 +83,27 @@ git clone https://github.com/rejoy2004-rgb/naina-chatbot.git
 cd naina-chatbot
 ```
 
-## Create Virtual Environment
+---
 
-```bash
-python -m venv venv
-```
+## Create Virtual Environment
 
 ### Windows
 
 ```bash
+python -m venv venv
 venv\Scripts\activate
 ```
 
 ### Linux / Mac
 
 ```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
 
 ---
 
-# Install Dependencies
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -127,23 +111,23 @@ pip install -r requirements.txt
 
 ---
 
-# Gemini API Setup
+# Configure Gemini API
 
-Create a `.env` file in the root directory.
+Create a `.env` file in the root directory:
 
 ```env
-GEMINI_API_KEY=YOUR_API_KEY_HERE
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```
 
-Get a Gemini API key from:
+Generate a Gemini API key from:
 
 https://aistudio.google.com/app/apikey
 
 ---
 
-# Add PDF Documents
+# Add Research Papers
 
-Place all research papers inside:
+Place your PDF files inside:
 
 ```text
 documents/
@@ -154,60 +138,64 @@ Example:
 ```text
 documents/
 ├── Amblyopia.pdf
-├── DryEyeSyndrome.pdf
 ├── VisualTherapy.pdf
+├── DryEye.pdf
 ```
 
 ---
 
-# Build Vector Database
+# Create Vector Database
 
-Generate embeddings and create the vector database:
+Generate embeddings and build the vector database:
 
 ```bash
 python rag/create_vector_db.py
 ```
 
-Expected Output:
+Expected output:
 
 ```text
-Loaded 120 pages
-Created 450 chunks
+Loaded 150 pages
+Created 500 chunks
 
 Vector DB Created Successfully
 ```
 
 ---
 
-# Run Chatbot
+# Run Streamlit Application
+
+Start the application:
 
 ```bash
-python chatbot.py
+streamlit run app.py
+```
+
+Open:
+
+```text
+http://localhost:8501
 ```
 
 ---
 
-# Example Usage
+# Example Questions
 
 ```text
-Welcome to Naina AI
+What is amblyopia?
 
-1. Sign Up
-2. Login
-```
+What does the amblyopia paper say?
 
-After login:
+Explain convergence insufficiency.
 
-```text
-You: What does the amblyopia paper say?
+What exercises help improve binocular vision?
 
-Naina:
-Amblyopia is a visual development disorder...
+What causes digital eye strain?
 ```
 
 ---
 
-# Semantic RAG Pipeline
+# RAG Pipeline
 
 ```text
 User Question
@@ -228,10 +216,10 @@ Final Response
 # Technologies Used
 
 * Python
+* Streamlit
 * Gemini 2.5 Flash
-* Google Generative AI SDK
-* LangChain
 * ChromaDB
+* LangChain
 * Sentence Transformers
 * SQLite
 * PyPDF
@@ -239,26 +227,68 @@ Final Response
 
 ---
 
+# Deploying on Streamlit Community Cloud
+
+1. Push your project to GitHub.
+
+2. Login to Streamlit Community Cloud:
+
+https://share.streamlit.io
+
+3. Click:
+
+```text
+New App
+```
+
+4. Select:
+
+```text
+Repository:
+rejoy2004-rgb/naina-chatbot
+
+Branch:
+main
+
+Main File:
+app.py
+```
+
+5. Add Secrets:
+
+```toml
+GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+```
+
+6. Click Deploy.
+
+Your application will be available at:
+
+```text
+https://your-app-name.streamlit.app
+```
+
+---
+
 # Future Improvements
 
-* Source Citations
-* PDF Page References
-* Streamlit Web Interface
-* Voice Assistant Support
-* Multi-PDF Knowledge Base
-* Clinical FAQ System
-* Website Integration
-* Doctor Recommendation System
-* Analytics Dashboard
-* Cloud Deployment
+* Source citations
+* PDF page references
+* Voice assistant
+* Image analysis
+* Eye exercise recommendations
+* Progress tracking
+* User dashboards
+* Website integration
+* Mobile application
 
 ---
 
 # Disclaimer
 
-Naina AI is an educational and informational assistant.
+Naina AI is intended for educational and informational purposes only.
 
-It is not intended to diagnose, treat, cure, or prevent any disease. Users should always consult qualified eye-care professionals for medical advice and treatment.
+It does not diagnose, treat, cure, or prevent any disease. Users should consult qualified eye-care professionals for medical advice, diagnosis, and treatment.
 
 ---
 
@@ -266,4 +296,4 @@ It is not intended to diagnose, treat, cure, or prevent any disease. Users shoul
 
 Rejoy Besra
 
-Naina AI — Eye Wellness & Visual Therapy Assistant
+Naina AI – Eye Wellness & Visual Therapy Assistant
