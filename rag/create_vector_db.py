@@ -1,28 +1,23 @@
+import os
+
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-import os
+from langchain_huggingface import HuggingFaceEmbeddings
 
 DOCUMENT_FOLDER = "documents"
 
 all_docs = []
 
 for file in os.listdir(DOCUMENT_FOLDER):
-
     if file.endswith(".pdf"):
-
         path = os.path.join(
             DOCUMENT_FOLDER,
             file
         )
 
         loader = PyPDFLoader(path)
-
         docs = loader.load()
-
         all_docs.extend(docs)
 
 print(f"Loaded {len(all_docs)} pages")
@@ -39,13 +34,13 @@ chunks = splitter.split_documents(
 print(f"Created {len(chunks)} chunks")
 
 embeddings = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2"
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
 db = Chroma.from_documents(
-    chunks,
-    embeddings,
+    documents=chunks,
+    embedding=embeddings,
     persist_directory="vector_db"
 )
 
-print("Vector DB Created Successfully")
+print("Vector database created.")
