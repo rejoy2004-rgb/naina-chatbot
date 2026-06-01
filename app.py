@@ -6,10 +6,7 @@ from openai import OpenAI
 
 from rag.retrieve import retrieve_context
 
-# =====================================
 # OPENROUTER SETUP
-# =====================================
-
 load_dotenv()
 
 api_key = os.getenv("OPENROUTER_API_KEY")
@@ -23,20 +20,14 @@ client = OpenAI(
     api_key=api_key
 )
 
-# =====================================
 # PAGE CONFIG
-# =====================================
-
 st.set_page_config(
     page_title="Naina AI",
     page_icon="👁️",
     layout="centered"
 )
 
-# =====================================
 # HEADER
-# =====================================
-
 st.title("👁️ Naina AI")
 
 st.subheader(
@@ -47,17 +38,13 @@ st.caption(
     "Ask questions related to eye health, vision care, visual therapy, and eye wellness."
 )
 
-# =====================================
 # USER INPUT
-# =====================================
-
 question = st.text_input(
     "Ask your eye-health question"
 )
 
-# =====================================
+
 # ASK BUTTON
-# =====================================
 
 if st.button("Ask"):
 
@@ -67,18 +54,14 @@ if st.button("Ask"):
 
     try:
 
-        # ===============================
+    
         # RETRIEVE CONTEXT
-        # ===============================
-
         with st.spinner("Searching knowledge base..."):
 
             context = retrieve_context(question)
 
-        # ===============================
+    
         # CHECK CONTEXT
-        # ===============================
-
         if not context.strip():
 
             st.warning(
@@ -86,10 +69,8 @@ if st.button("Ask"):
             )
             st.stop()
 
-        # ===============================
+      
         # OPENROUTER RESPONSE
-        # ===============================
-
         with st.spinner("Generating response..."):
 
             response = client.chat.completions.create(
@@ -170,10 +151,8 @@ Knowledge Base Context:
                 .content
             )
 
-        # ===============================
+        
         # DISPLAY RESPONSE
-        # ===============================
-
         st.success(
             "👁️ Naina AI Knowledge-Based Response"
         )
@@ -186,10 +165,7 @@ Knowledge Base Context:
             f"Error: {e}"
         )
 
-# =====================================
 # FOOTER
-# =====================================
-
 st.divider()
 
 with st.expander("About Naina AI"):
