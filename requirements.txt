@@ -1,12 +1,10 @@
 streamlit
 python-dotenv
-google-generativeai
-
+openai
+chromadb
+sentence-transformers
 langchain
 langchain-community
-langchain-text-splitters
 langchain-huggingface
-
-sentence-transformers
-chromadb
+langchain-text-splitters
 pypdf
